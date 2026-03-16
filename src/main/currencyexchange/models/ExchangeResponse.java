@@ -1,19 +1,18 @@
-package main.currencyexchange.model;
+package main.currencyexchange.models;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-public class ExchangeRate {
-
-    private int id;
+public class ExchangeResponse {
     private Currency baseCurrency;
     private Currency targetCurrency;
     private double rate;
-
+    private double amount;
+    private double convertedAmount;
 }

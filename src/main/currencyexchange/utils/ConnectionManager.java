@@ -1,18 +1,46 @@
 package main.currencyexchange.utils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class ConnectionManager {
-    private static final String URL_KEY = "db.url";
-    private static final String USER_KEY = "db.name";
-    private static final String PASSWORD_KEY = "db.password";
+    private static final Properties properties = new Properties();
 
-    public static Connection open(){
+    static {
+        try (InputStream input = ConnectionManager.class
+                .getClassLoader()
+                .getResourceAsStream("application.properties")) {
+
+            properties.load(input);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Connection open() throws SQLException {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e){
+            throw new RuntimeException(e);
+        }
+        String url = properties.getProperty("main.db.url");
+        String user = properties.getProperty("main.db.name");
+        String password = properties.getProperty("main.db.password");
+
+        return DriverManager.getConnection(url, user, password);
+    }
+
+    public static boolean isConnecting(){
         try{
-            return DriverManager.getConnection(URL_KEY, USER_KEY, PASSWORD_KEY);
-        } catch (SQLException e) {
+            Connection conn = open();
+            return (conn != null && !conn.isClosed());
+
+        } catch (SQLException e){
             throw new RuntimeException(e);
         }
     }

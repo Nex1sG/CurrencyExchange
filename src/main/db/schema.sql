@@ -1,13 +1,15 @@
+
+
 CREATE TABLE currencies (
-                            id SERIAL PRIMARY KEY,
-                            code TEXT UNIQUE,
-                            full_name TEXT,
-                            sign TEXT
+                            ID SERIAL PRIMARY KEY,
+                            Code TEXT UNIQUE,
+                            FullName TEXT,
+                            Sign TEXT
 );
 
 CREATE TABLE exchange_rates (
-                                id SERIAL PRIMARY KEY,
-                                base_currency_id INTEGER,
-                                target_currency_id INTEGER,
-                                rate REAL
+                                ID SERIAL PRIMARY KEY,
+                                BaseCurrencyId INTEGER,
+                                TargetCurrencyId INTEGER,
+                                Rate REAL
 );

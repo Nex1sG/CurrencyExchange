@@ -10,6 +10,4 @@ public class Utils {
 
         return amount >= 0 && amount <= 100_000_000;
     }
-
-
 }

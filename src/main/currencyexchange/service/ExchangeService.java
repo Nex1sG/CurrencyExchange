@@ -1,4 +1,4 @@
-package main.currencyexchange.servlet;
+package main.currencyexchange.service;
 
 import main.currencyexchange.repositories.CurrencyRepository;
 import main.currencyexchange.repositories.ExchangeRateRepository;

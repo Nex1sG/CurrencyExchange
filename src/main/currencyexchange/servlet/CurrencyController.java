@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import main.currencyexchange.models.Currency;
 import main.currencyexchange.repositories.CurrencyRepository;
+import main.currencyexchange.service.CurrencyService;
 
 import java.io.IOException;
 import java.util.List;

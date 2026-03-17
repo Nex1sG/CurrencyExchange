@@ -1,4 +1,4 @@
-INSERT INTO currencies (id, code, full_name, sign) VALUES
+INSERT INTO currencies (ID, Code, Fullname, Sign) VALUES
                                                        (1, 'USD', 'United States Dollar', '$'),
                                                        (2, 'EUR', 'Euro', '€'),
                                                        (3, 'GBP', 'British Pound Sterling', '£'),
@@ -8,7 +8,7 @@ INSERT INTO currencies (id, code, full_name, sign) VALUES
                                                        (7, 'CHF', 'Swiss Franc', '₣'),
                                                        (8, 'CAD', 'Canadian Dollar', '$'),
                                                        (9, 'AUD', 'Australian Dollar', '$');
-INSERT INTO exchange_rates (id, base_currency_id, target_currency_id, rate) VALUES
+INSERT INTO exchange_rates (ID, Basecurrencyid, Targetcurrencyid, Rate) VALUES
                                                                                 (1, 1, 2, 0.92),   -- USD → EUR
                                                                                 (2, 2, 1, 1.09),   -- EUR → USD
                                                                                 (3, 1, 3, 0.78),   -- USD → GBP

@@ -1,5 +1,6 @@
 package main.currencyexchange.repositories;
 
+import main.currencyexchange.exceptions.DatabaseException;
 import main.currencyexchange.models.Currency;
 
 import static main.currencyexchange.utils.ConnectionManager.open;
@@ -16,67 +17,67 @@ import java.util.Optional;
 public class CurrencyRepository implements CrudRepository<Currency>{
 
 
-    protected static Currency currencyCreating(ResultSet resultSet) throws SQLException{
+    protected static Currency mapToCurrency(ResultSet resultSet) throws SQLException{
         Currency currency = new Currency();
         currency.setId(resultSet.getLong("id"));
         currency.setCode(resultSet.getString("code"));
-        currency.setFullName(resultSet.getString("full_name"));
+        currency.setFullName(resultSet.getString("fullName"));
         currency.setSign(resultSet.getString("sign"));
         return currency;
     }
 
     public Optional<Currency> findByCode(String code){
-        String query = "SELECT * FROM currencies WHERE code = ?";
+        String query = "SELECT id, code, fullName, sign FROM currencies WHERE code = ?";
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
 
             statement.setString(1, code);
             ResultSet rs = statement.executeQuery();
 
-            return !rs.next() ? Optional.empty() : Optional.of(currencyCreating(rs));
+            return !rs.next() ? Optional.empty() : Optional.of(mapToCurrency(rs));
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DatabaseException("Failed to find currency with code=" + code, e);
         }
     }
 
     @Override
     public Optional<Currency> findById(long id) {
-        String query = "SELECT id, code, full_name, sign FROM currencies WHERE id = ?";
+        String query = "SELECT id, code, fullName, sign FROM currencies WHERE id = ?";
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
 
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
 
-            return !rs.next() ? Optional.empty() : Optional.of(currencyCreating(rs));
+            return !rs.next() ? Optional.empty() : Optional.of(mapToCurrency(rs));
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DatabaseException("Failed to fetch currency with id=" + id, e);
         }
     }
 
     @Override
-    public Optional<List<Currency>> findAll(){
-        String query = "SELECT id, code, full_name, sign FROM currencies ";
+    public List<Currency> findAll(){
+        String query = "SELECT id, code, fullName, sign FROM currencies ";
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
 
             ResultSet rs = statement.executeQuery();
             List<Currency> currencies = new ArrayList<>();
-            while (rs.next()) currencies.add(currencyCreating(rs));
+            while (rs.next()) currencies.add(mapToCurrency(rs));
 
-            return currencies.isEmpty() ? Optional.empty() : Optional.of(currencies);
+            return currencies;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DatabaseException("Failed to fetch currencies for find all", e);
         }
     }
 
 
     @Override
     public void save(Currency currency){
-        String query = "INSERT INTO currencies (code, full_name, sign) VALUES (?, ?, ?)";
+        String query = "INSERT INTO currencies (code, fullName, sign) VALUES (?, ?, ?)";
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
 
@@ -86,14 +87,14 @@ public class CurrencyRepository implements CrudRepository<Currency>{
             statement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException();
+            throw new DatabaseException("Failed to save currency with code=" + currency.getCode(), e);
         }
     }
 
     @Override
-    public void update(Currency currency) {
+    public boolean update(Currency currency) {
 
-        String query = "UPDATE currencies SET code = ?, full_name = ?, sign = ? WHERE id = ?";
+        String query = "UPDATE currencies SET code = ?, fullName = ?, sign = ? WHERE id = ?";
 
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
@@ -103,24 +104,27 @@ public class CurrencyRepository implements CrudRepository<Currency>{
             statement.setString(3, currency.getSign());
             statement.setLong(4, currency.getId());
 
-            statement.executeUpdate();
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
 
         }catch (SQLException e) {
-            throw new RuntimeException();
+            throw new DatabaseException("Failed to update currency with id=" + currency.getId(), e);
         }
     }
 
 //    @Override
-    public void delete(String code){
+    public boolean delete(long id){
         String query = "DELETE FROM currencies WHERE code = ?";
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
 
-            statement.setString(1, code);
-            statement.executeUpdate();
+            statement.setLong(1, id);
 
-        } catch (SQLException e) {
-            throw new RuntimeException();
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e){
+            throw new DatabaseException("Failed to delete currency with id=" + id, e);
         }
     }
 }

@@ -13,7 +13,8 @@ import main.currencyexchange.service.CurrencyService;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/currencies/*") // Эндпоинт или маппинг
+@WebServlet("/currencies/*")
+
 public class CurrencyController extends HttpServlet {
 
     private final CurrencyService currencyService = new CurrencyService();
@@ -22,80 +23,52 @@ public class CurrencyController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+            throws IOException{
 
-        try {
+        String pathInfo = req.getPathInfo();
+        resp.setContentType("application/json");
 
-            String pathInfo = req.getPathInfo();
-            resp.setContentType("application/json");
-
-            if (pathInfo == null || pathInfo.equals("/")) {
-
-                List<Currency> currencies = currencyService.readReq();
-                objectMapper.writeValue(resp.getWriter(), currencies);
-
-            } else {
-
-                String code = pathInfo.substring(1);
-                Currency currency = currencyService.readReq(code);
-
-                if (currency == null) {
-                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    return;
-                }
-
-                objectMapper.writeValue(resp.getWriter(), currency);
-            }
-
+        if (pathInfo == null || pathInfo.equals("/")) {
+            List<Currency> currencies = currencyService.readReq();
+            objectMapper.writeValue(resp.getWriter(), currencies);
             resp.setStatus(HttpServletResponse.SC_OK);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
+
+        String code = pathInfo.substring(1);
+        Currency currency = currencyService.readReq(code);
+        objectMapper.writeValue(resp.getWriter(), currency);
+        resp.setStatus(HttpServletResponse.SC_OK);
     }
-    // POST /currencies
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp){
-        try {
-            Currency currency = objectMapper.readValue(req.getInputStream(), Currency.class);
-            currencyRepository.save(currency);
-            resp.setStatus(HttpServletResponse.SC_CREATED);
 
-        } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        }
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Currency currency = objectMapper.readValue(req.getInputStream(), Currency.class);
+        currencyRepository.save(currency);
+        resp.setContentType("application/json");
+        resp.setStatus(HttpServletResponse.SC_CREATED);
     }
 
     // PATCH /currencies
-    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) {
-        try {
-            Currency currency = objectMapper.readValue(req.getInputStream(), Currency.class);
-            currencyRepository.save(currency);
-            resp.setStatus(HttpServletResponse.SC_OK);
-
-        } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp)  throws IOException{
+        Currency currency = objectMapper.readValue(req.getInputStream(), Currency.class);
+        currencyRepository.save(currency);
+        resp.setContentType("application/json");
+        resp.setStatus(HttpServletResponse.SC_OK);
         }
-    }
 
-    // DELETE /currencies/USD
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        try {
-            String pathInfo = req.getPathInfo();
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp){
+        String pathInfo = req.getPathInfo();
 
-            if (pathInfo == null || pathInfo.equals("/")) {
-                throw new IllegalArgumentException("Currency code required");
-            }
-
-            String code = pathInfo.substring(1);
-            currencyRepository.delete(code);
-            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-
-        } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        if (pathInfo == null || pathInfo.equals("/")) {
+            throw new IllegalArgumentException("Currency code required");
         }
+
+        long id = Long.parseLong(pathInfo.substring(1));
+        currencyRepository.delete(id);
+        resp.setContentType("application/json");
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     @Override

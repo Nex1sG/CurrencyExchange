@@ -1,5 +1,6 @@
 package main.currencyexchange.service;
 
+import main.currencyexchange.exceptions.ExchangeRateNotFoundException;
 import main.currencyexchange.repositories.CurrencyRepository;
 import main.currencyexchange.models.Currency;
 
@@ -13,19 +14,21 @@ public class CurrencyService {
     public Currency readReq(String code){
         Optional<Currency> currency = currencyRepository.findByCode(code);
         if(currency.isPresent()) return currency.get();
-        throw new NullPointerException();
+        throw new ExchangeRateNotFoundException("Exchange rate with code=" + code +
+                " is not found in database");
     }
 
     public List<Currency> readReq(){
-        Optional<List<Currency>> currencies = currencyRepository.findAll();
-        if(currencies.isPresent()) return  currencies.get();
-        throw new NullPointerException();
+        List<Currency> currencies = currencyRepository.findAll();
+        if(!currencies.isEmpty()) return  currencies;
+        throw new ExchangeRateNotFoundException("Exchange rates not found in database");
     }
 
     public Currency readReq(int id){
         Optional<Currency> currency = currencyRepository.findById(id);
         if(currency.isPresent()) return currency.get();
-        throw new NullPointerException();
+        throw new ExchangeRateNotFoundException("Exchange rate with id=" + id +
+                " is not found in database");
     }
 
 }

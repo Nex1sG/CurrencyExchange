@@ -1,4 +1,4 @@
-package main.currencyexchange.servlet;
+package main.currencyexchange.output.servlet;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,10 +6,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import main.currencyexchange.models.ExchangeResponse;
-import main.currencyexchange.repositories.CurrencyRepository;
-import main.currencyexchange.repositories.ExchangeRateRepository;
-import main.currencyexchange.service.ExchangeService;
+import main.currencyexchange.data.models.ExchangeResponse;
+import main.currencyexchange.data.repositories.CurrencyRepository;
+import main.currencyexchange.data.repositories.ExchangeRateRepository;
+import main.currencyexchange.input.service.ExchangeService;
 
 import java.io.IOException;
 

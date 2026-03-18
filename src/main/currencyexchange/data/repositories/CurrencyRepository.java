@@ -1,9 +1,9 @@
-package main.currencyexchange.repositories;
+package main.currencyexchange.data.repositories;
 
-import main.currencyexchange.exceptions.DatabaseException;
-import main.currencyexchange.models.Currency;
+import main.currencyexchange.input.exceptions.DatabaseException;
+import main.currencyexchange.data.models.Currency;
 
-import static main.currencyexchange.utils.ConnectionManager.open;
+import static main.currencyexchange.input.utils.ConnectionManager.open;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

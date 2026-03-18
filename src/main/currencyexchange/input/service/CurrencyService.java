@@ -1,8 +1,10 @@
-package main.currencyexchange.service;
+package main.currencyexchange.input.service;
 
-import main.currencyexchange.exceptions.ExchangeRateNotFoundException;
-import main.currencyexchange.repositories.CurrencyRepository;
-import main.currencyexchange.models.Currency;
+import main.currencyexchange.input.exceptions.CurrencyAlreadyExistsException;
+import main.currencyexchange.input.exceptions.CurrencyNotFoundException;
+import main.currencyexchange.input.exceptions.ExchangeRateNotFoundException;
+import main.currencyexchange.data.repositories.CurrencyRepository;
+import main.currencyexchange.data.models.Currency;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,4 +33,19 @@ public class CurrencyService {
                 " is not found in database");
     }
 
+    public void create(Currency currency){
+        currencyRepository.save(currency);
+    }
+
+    public void update(Currency currency){
+        boolean isAffected = currencyRepository.update(currency);
+        if(!isAffected) throw new CurrencyAlreadyExistsException("Currency with code =" +
+                currency.getCode() + " already exists");
+       }
+
+    public void delete(long id){
+        boolean isAffected = currencyRepository.delete(id);
+        if(!isAffected) throw new CurrencyNotFoundException("Currency with id =" +
+                id + " not found");
+    }
 }

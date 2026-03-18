@@ -1,13 +1,13 @@
-package main.currencyexchange.service;
+package main.currencyexchange.input.service;
 
 import lombok.AllArgsConstructor;
-import main.currencyexchange.exceptions.CurrencyNotFoundException;
-import main.currencyexchange.exceptions.ExchangeRateNotFoundException;
-import main.currencyexchange.repositories.CurrencyRepository;
-import main.currencyexchange.repositories.ExchangeRateRepository;
-import main.currencyexchange.models.Currency;
-import main.currencyexchange.models.ExchangeRate;
-import main.currencyexchange.models.ExchangeResponse;
+import main.currencyexchange.input.exceptions.CurrencyNotFoundException;
+import main.currencyexchange.input.exceptions.ExchangeRateNotFoundException;
+import main.currencyexchange.data.repositories.CurrencyRepository;
+import main.currencyexchange.data.repositories.ExchangeRateRepository;
+import main.currencyexchange.data.models.Currency;
+import main.currencyexchange.data.models.ExchangeRate;
+import main.currencyexchange.data.models.ExchangeResponse;
 
 import java.util.Optional;
 

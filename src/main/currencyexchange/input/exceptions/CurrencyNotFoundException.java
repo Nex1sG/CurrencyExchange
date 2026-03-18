@@ -1,4 +1,4 @@
-package main.currencyexchange.exceptions;
+package main.currencyexchange.input.exceptions;
 
 public class CurrencyNotFoundException extends RuntimeException {
     public CurrencyNotFoundException(String message) {

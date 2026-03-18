@@ -1,4 +1,4 @@
-package main.currencyexchange.servlet;
+package main.currencyexchange.output.servlet;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,11 +7,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import main.currencyexchange.exceptions.ExchangeRateNotFoundException;
-import main.currencyexchange.exceptions.InvalidDataFormatException;
-import main.currencyexchange.models.ExchangeRate;
-import main.currencyexchange.repositories.CurrencyRepository;
-import main.currencyexchange.repositories.ExchangeRateRepository;
+import main.currencyexchange.input.exceptions.ExchangeRateNotFoundException;
+import main.currencyexchange.input.exceptions.InvalidDataFormatException;
+import main.currencyexchange.data.models.ExchangeRate;
+import main.currencyexchange.data.repositories.CurrencyRepository;
+import main.currencyexchange.data.repositories.ExchangeRateRepository;
 
 import java.io.IOException;
 import java.util.List;

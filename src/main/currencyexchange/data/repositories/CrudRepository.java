@@ -1,4 +1,4 @@
-package main.currencyexchange.repositories;
+package main.currencyexchange.data.repositories;
 
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package main.currencyexchange.models;
+package main.currencyexchange.data.models;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;

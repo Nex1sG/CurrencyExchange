@@ -1,4 +1,4 @@
-package main.currencyexchange.utils;
+package main.currencyexchange.input.utils;
 
 public class Utils {
 

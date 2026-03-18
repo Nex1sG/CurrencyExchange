@@ -7,20 +7,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import main.currencyexchange.input.exceptions.ExchangeRateNotFoundException;
 import main.currencyexchange.input.exceptions.InvalidDataFormatException;
 import main.currencyexchange.data.models.ExchangeRate;
-import main.currencyexchange.data.repositories.CurrencyRepository;
-import main.currencyexchange.data.repositories.ExchangeRateRepository;
+import main.currencyexchange.input.service.ExchangeRateService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @WebServlet("/exchangeRates/*")
 public class ExchangeRatesController extends HttpServlet {
-    private final CurrencyRepository currencyRepository = new CurrencyRepository();
-    private final ExchangeRateRepository exchangeRateRepository = new ExchangeRateRepository(currencyRepository);
+    private final ExchangeRateService exchangeRateService = new ExchangeRateService();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     //Get /exchangeRates
@@ -29,12 +25,14 @@ public class ExchangeRatesController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String pathInfo = req.getPathInfo();
         resp.setContentType("application/json");
+
         if (pathInfo == null || pathInfo.equals("/")) {
-            List<ExchangeRate> rates = exchangeRateRepository.findAll();
+            List<ExchangeRate> rates = exchangeRateService.readExchangeRate();
             objectMapper.writeValue(resp.getWriter(), rates);
             resp.setStatus(HttpServletResponse.SC_OK);
             return;
         }
+
         String pair = pathInfo.substring(1);
         String baseCurrency = pair.substring(0, 3);
         String targetCurrency = pair.substring(3);
@@ -44,9 +42,8 @@ public class ExchangeRatesController extends HttpServlet {
         }
 
 
-        Optional<ExchangeRate> rate = exchangeRateRepository.findByCurrencies(baseCurrency, targetCurrency);
-        if(rate.isEmpty()) throw new ExchangeRateNotFoundException("Exchange rate not found");
-        objectMapper.writeValue(resp.getWriter(), rate.get());
+        ExchangeRate rate = exchangeRateService.readExchangeRate(baseCurrency, targetCurrency);
+        objectMapper.writeValue(resp.getWriter(), rate);
         resp.setStatus(HttpServletResponse.SC_OK);
 
     }
@@ -54,7 +51,7 @@ public class ExchangeRatesController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         ExchangeRate exchangeRate = objectMapper.readValue(req.getInputStream(), ExchangeRate.class);
-        exchangeRateRepository.save(exchangeRate);
+        exchangeRateService.create(exchangeRate);
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_CREATED);
     }
@@ -70,7 +67,7 @@ public class ExchangeRatesController extends HttpServlet {
 
     protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws IOException{
         ExchangeRate exchangeRate = objectMapper.readValue(req.getInputStream(), ExchangeRate.class);
-        exchangeRateRepository.update(exchangeRate);
+        exchangeRateService.update(exchangeRate);
 
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_CREATED);

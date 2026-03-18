@@ -9,9 +9,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import main.currencyexchange.data.models.ExchangeResponse;
 import main.currencyexchange.data.repositories.CurrencyRepository;
 import main.currencyexchange.data.repositories.ExchangeRateRepository;
+import main.currencyexchange.input.exceptions.InvalidDataFormatException;
 import main.currencyexchange.input.service.ExchangeService;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @WebServlet({"/exchange", "/exchange/*"})
 public class ExchangeController extends HttpServlet {
@@ -22,12 +24,20 @@ public class ExchangeController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
+
         String base = req.getParameter("from");
         String target = req.getParameter("to");
-        int amount = Integer.parseInt(req.getParameter("amount"));
+        BigDecimal amount;
 
+        try {
+            amount = new BigDecimal(req.getParameter("amount"));
+        } catch (NumberFormatException e) {
+            throw new InvalidDataFormatException("Some problems with amount");
+        }
 
         ExchangeResponse exchangeResponse = exchangeRateService.exchange(base, target, amount);
+        resp.setContentType("application/json");
+        resp.setStatus(HttpServletResponse.SC_OK);
         objectMapper.writeValue(resp.getWriter(), exchangeResponse);
     }
 }

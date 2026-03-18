@@ -12,13 +12,37 @@ import main.currencyexchange.input.service.CurrencyService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet("/currencies/*")
-
 public class CurrencyController extends HttpServlet {
 
     private final CurrencyService currencyService = new CurrencyService();
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public Optional<Currency> getParamsAndCreateEntity(HttpServletRequest req){
+        String code = req.getParameter("code");
+        String name = req.getParameter("name");
+        String sign = req.getParameter("sign");
+
+        if(code == null || name == null || sign == null){
+            throw new InvalidDataFormatException("Please, check entered fields");
+        }
+
+        if(code.isEmpty() || name.isEmpty() || sign.isEmpty()){
+            throw new InvalidDataFormatException("Please, check entered fields");
+        }
+        if(code.length() != 3){
+            throw new InvalidDataFormatException("Code length must be 3");
+        }
+
+        Currency currency = new Currency();
+        currency.setCode(code);
+        currency.setName(name);
+        currency.setSign(sign);
+
+        return Optional.of(currency);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -41,17 +65,21 @@ public class CurrencyController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Currency currency = objectMapper.readValue(req.getInputStream(), Currency.class);
-        currencyService.create(currency);
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+        Optional<Currency> currency = getParamsAndCreateEntity(req);
+        if(currency.isEmpty()) return;
+        currencyService.create(currency.get());
+
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_CREATED);
     }
 
     // PATCH /currencies
-    protected void doPatch(HttpServletRequest req, HttpServletResponse resp)  throws IOException{
-        Currency currency = objectMapper.readValue(req.getInputStream(), Currency.class);
-        currencyService.update(currency);
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp){
+        Optional<Currency> currency= getParamsAndCreateEntity(req);
+        if(currency.isEmpty()) return;
+        currencyService.update(currency.get());
+
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_RESET_CONTENT);
         }

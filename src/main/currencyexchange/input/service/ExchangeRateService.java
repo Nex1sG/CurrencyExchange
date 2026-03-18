@@ -39,11 +39,18 @@ public class ExchangeRateService {
     }
 
     public void update(ExchangeRate exchangeRate){
-        boolean isAffected = exchangeRateRepository.update(exchangeRate);
-        if(!isAffected)  throw new ExchangeRateNotFoundException(
-                "Exchange rate with base/target currency=" +
-                exchangeRate.getBaseCurrency() + exchangeRate.getTargetCurrency() +
-                " is not found in database");
+        Optional<ExchangeRate> existing = exchangeRateRepository.findByCurrencies(
+                exchangeRate.getBaseCurrency().getCode(),
+                exchangeRate.getTargetCurrency().getCode()
+        );
+
+        if (existing.isEmpty()) {
+            throw new ExchangeRateNotFoundException("Exchange rate not found");
+        }
+
+        existing.get().setRate(exchangeRate.getRate());
+
+        exchangeRateRepository.update(existing.get());
     }
 
     public void delete(long id){

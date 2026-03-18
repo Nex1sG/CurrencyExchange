@@ -11,5 +11,5 @@ CREATE TABLE exchange_rates (
                                 ID SERIAL PRIMARY KEY,
                                 BaseCurrencyId INTEGER,
                                 TargetCurrencyId INTEGER,
-                                Rate REAL
+                                Rate DECIMAL(14, 6)
 );

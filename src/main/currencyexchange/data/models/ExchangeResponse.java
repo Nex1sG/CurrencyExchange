@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -12,7 +14,7 @@ import lombok.Setter;
 public class ExchangeResponse {
     private Currency baseCurrency;
     private Currency targetCurrency;
-    private double rate;
-    private double amount;
-    private double convertedAmount;
+    private BigDecimal rate;
+    private BigDecimal amount;
+    private BigDecimal convertedAmount;
 }

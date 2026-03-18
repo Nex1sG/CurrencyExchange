@@ -62,6 +62,10 @@ public class ExceptionHandlerFilter implements Filter {
             log.error("Incorrect field arguments ", e);
             writeError(req, response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
 
+        } catch (IOException e){
+            log.error("Incorrect arguments ", e);
+            writeError(req, response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+
         } catch (Exception e) {
             log.error("Some problem with server ", e);
             writeError(req, response,

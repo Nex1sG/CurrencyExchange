@@ -21,7 +21,7 @@ public class CurrencyRepository implements CrudRepository<Currency>{
         Currency currency = new Currency();
         currency.setId(resultSet.getLong("id"));
         currency.setCode(resultSet.getString("code"));
-        currency.setFullName(resultSet.getString("fullName"));
+        currency.setName(resultSet.getString("fullName"));
         currency.setSign(resultSet.getString("sign"));
         return currency;
     }
@@ -77,12 +77,12 @@ public class CurrencyRepository implements CrudRepository<Currency>{
 
     @Override
     public void save(Currency currency){
-        String query = "INSERT INTO currencies (code, fullName, sign) VALUES (?, ?, ?)";
+        String query = "INSERT INTO currencies (code, FullName, sign) VALUES (?, ?, ?)";
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
 
             statement.setString(1, currency.getCode());
-            statement.setString(2, currency.getFullName());
+            statement.setString(2, currency.getName());
             statement.setString(3, currency.getSign());
             statement.executeUpdate();
 
@@ -100,7 +100,7 @@ public class CurrencyRepository implements CrudRepository<Currency>{
              PreparedStatement statement = conn.prepareStatement(query)) {
 
             statement.setString(1, currency.getCode());
-            statement.setString(2, currency.getFullName());
+            statement.setString(2, currency.getName());
             statement.setString(3, currency.getSign());
             statement.setLong(4, currency.getId());
 

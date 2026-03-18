@@ -37,7 +37,7 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
         exchangeRate.setId(rs.getLong("id"));
         exchangeRate.setBaseCurrency(baseCurrency);
         exchangeRate.setTargetCurrency(targetCurrency);
-        exchangeRate.setRate(rs.getDouble("rate"));
+        exchangeRate.setRate(rs.getBigDecimal("rate"));
 
         return exchangeRate;
     }
@@ -100,8 +100,13 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
 
             statement.setLong(1, exchangeRate.getBaseCurrency().getId());
             statement.setLong(2, exchangeRate.getTargetCurrency().getId());
-            statement.setDouble(3, exchangeRate.getRate());
+            statement.setBigDecimal(3, exchangeRate.getRate());
 
+            if (exchangeRate.getBaseCurrency() == null ||
+                    exchangeRate.getTargetCurrency() == null ||
+                    exchangeRate.getRate() == null) {
+                throw new IllegalArgumentException("ExchangeRate contains null fields");
+            }
             statement.executeUpdate();
 
         } catch (SQLException e) {
@@ -119,7 +124,7 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
 
-            statement.setDouble(1, exchangeRate.getRate());
+            statement.setBigDecimal(1, exchangeRate.getRate());
             statement.setLong(2, exchangeRate.getId());
 
             int affectedRows = statement.executeUpdate();

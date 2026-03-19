@@ -1,4 +1,4 @@
-package main.currencyexchange.input.utils;
+package main.exchange.input.utils;
 
 import lombok.Getter;
 import lombok.Setter;

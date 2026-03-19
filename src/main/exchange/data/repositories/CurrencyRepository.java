@@ -1,9 +1,10 @@
-package main.currencyexchange.data.repositories;
+package main.exchange.data.repositories;
 
-import main.currencyexchange.input.exceptions.DatabaseException;
-import main.currencyexchange.data.models.Currency;
+import main.exchange.input.exceptions.CurrencyAlreadyExistsException;
+import main.exchange.input.exceptions.DatabaseException;
+import main.exchange.data.models.Currency;
 
-import static main.currencyexchange.input.utils.ConnectionManager.open;
+import static main.exchange.input.utils.ConnectionProvider.open;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,13 +22,13 @@ public class CurrencyRepository implements CrudRepository<Currency>{
         Currency currency = new Currency();
         currency.setId(resultSet.getLong("id"));
         currency.setCode(resultSet.getString("code"));
-        currency.setName(resultSet.getString("fullName"));
+        currency.setName(resultSet.getString("full_name"));
         currency.setSign(resultSet.getString("sign"));
         return currency;
     }
 
     public Optional<Currency> findByCode(String code){
-        String query = "SELECT id, code, fullName, sign FROM currencies WHERE code = ?";
+        String query = "SELECT id, code, full_name, sign FROM currencies WHERE code = ?";
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
 
@@ -43,7 +44,7 @@ public class CurrencyRepository implements CrudRepository<Currency>{
 
     @Override
     public Optional<Currency> findById(long id) {
-        String query = "SELECT id, code, fullName, sign FROM currencies WHERE id = ?";
+        String query = "SELECT id, code, full_name, sign FROM currencies WHERE id = ?";
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
 
@@ -59,7 +60,7 @@ public class CurrencyRepository implements CrudRepository<Currency>{
 
     @Override
     public List<Currency> findAll(){
-        String query = "SELECT id, code, fullName, sign FROM currencies ";
+        String query = "SELECT id, code, full_name, sign FROM currencies ";
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
 
@@ -77,7 +78,7 @@ public class CurrencyRepository implements CrudRepository<Currency>{
 
     @Override
     public void save(Currency currency){
-        String query = "INSERT INTO currencies (code, FullName, sign) VALUES (?, ?, ?)";
+        String query = "INSERT INTO currencies (code, full_name, sign) VALUES (?, ?, ?)";
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
 
@@ -87,6 +88,9 @@ public class CurrencyRepository implements CrudRepository<Currency>{
             statement.executeUpdate();
 
         } catch (SQLException e) {
+            if (e.getMessage().contains("unique")) {
+                throw new CurrencyAlreadyExistsException("Currency already exists: " + currency.getCode());
+            }
             throw new DatabaseException("Failed to save currency with code=" + currency.getCode(), e);
         }
     }
@@ -94,7 +98,7 @@ public class CurrencyRepository implements CrudRepository<Currency>{
     @Override
     public boolean update(Currency currency) {
 
-        String query = "UPDATE currencies SET code = ?, fullName = ?, sign = ? WHERE id = ?";
+        String query = "UPDATE currencies SET code = ?, full_name = ?, sign = ? WHERE id = ?";
 
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {

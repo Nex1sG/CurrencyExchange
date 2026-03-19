@@ -1,10 +1,11 @@
-package main.currencyexchange.input.service;
+package main.exchange.input.service;
 
-import main.currencyexchange.data.models.ExchangeRate;
-import main.currencyexchange.data.repositories.CurrencyRepository;
-import main.currencyexchange.data.repositories.ExchangeRateRepository;
-import main.currencyexchange.input.exceptions.CurrencyNotFoundException;
-import main.currencyexchange.input.exceptions.ExchangeRateNotFoundException;
+import main.exchange.data.models.ExchangeRate;
+import main.exchange.data.repositories.CurrencyRepository;
+import main.exchange.data.repositories.ExchangeRateRepository;
+import main.exchange.input.exceptions.CurrencyNotFoundException;
+import main.exchange.input.exceptions.ExchangeRateAlreadyExistsException;
+import main.exchange.input.exceptions.ExchangeRateNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,10 +35,16 @@ public class ExchangeRateService {
                 " is not found in database");
     }
 
-    public void create(ExchangeRate exchangeRate){
+    public void create(ExchangeRate exchangeRate) {
+        if (exchangeRateRepository.findByCurrencies(
+                exchangeRate.getBaseCurrency().getCode(),
+                exchangeRate.getTargetCurrency().getCode()
+        ).isPresent()) {
+            throw new ExchangeRateAlreadyExistsException("Exchange rate already exists");
+        }
+
         exchangeRateRepository.save(exchangeRate);
     }
-
     public void update(ExchangeRate exchangeRate){
         Optional<ExchangeRate> existing = exchangeRateRepository.findByCurrencies(
                 exchangeRate.getBaseCurrency().getCode(),

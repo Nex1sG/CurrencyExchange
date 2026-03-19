@@ -1,4 +1,4 @@
-package main.currencyexchange.output.servlet;
+package main.exchange.output.servlet;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,11 +6,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import main.currencyexchange.data.models.ExchangeResponse;
-import main.currencyexchange.data.repositories.CurrencyRepository;
-import main.currencyexchange.data.repositories.ExchangeRateRepository;
-import main.currencyexchange.input.exceptions.InvalidDataFormatException;
-import main.currencyexchange.input.service.ExchangeService;
+import main.exchange.data.models.ExchangeResponse;
+import main.exchange.data.repositories.CurrencyRepository;
+import main.exchange.data.repositories.ExchangeRateRepository;
+import main.exchange.input.exceptions.InvalidDataFormatException;
+import main.exchange.input.service.ExchangeService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -32,7 +32,7 @@ public class ExchangeController extends HttpServlet {
         try {
             amount = new BigDecimal(req.getParameter("amount"));
         } catch (NumberFormatException e) {
-            throw new InvalidDataFormatException("Some problems with amount");
+            throw new InvalidDataFormatException("Some problems with amount: ");
         }
 
         ExchangeResponse exchangeResponse = exchangeRateService.exchange(base, target, amount);

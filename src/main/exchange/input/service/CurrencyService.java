@@ -1,10 +1,10 @@
-package main.currencyexchange.input.service;
+package main.exchange.input.service;
 
-import main.currencyexchange.input.exceptions.CurrencyAlreadyExistsException;
-import main.currencyexchange.input.exceptions.CurrencyNotFoundException;
-import main.currencyexchange.input.exceptions.ExchangeRateNotFoundException;
-import main.currencyexchange.data.repositories.CurrencyRepository;
-import main.currencyexchange.data.models.Currency;
+import main.exchange.input.exceptions.CurrencyAlreadyExistsException;
+import main.exchange.input.exceptions.CurrencyNotFoundException;
+import main.exchange.input.exceptions.ExchangeRateNotFoundException;
+import main.exchange.data.repositories.CurrencyRepository;
+import main.exchange.data.models.Currency;
 
 import java.util.List;
 import java.util.Optional;

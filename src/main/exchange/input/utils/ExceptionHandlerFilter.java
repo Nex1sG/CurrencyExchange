@@ -1,4 +1,4 @@
-package main.currencyexchange.input.utils;
+package main.exchange.input.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.Filter;
 import lombok.extern.slf4j.Slf4j;
-import main.currencyexchange.input.exceptions.*;
+import main.exchange.input.exceptions.*;
 
 import java.io.IOException;
 

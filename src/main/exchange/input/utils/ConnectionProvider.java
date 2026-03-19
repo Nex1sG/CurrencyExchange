@@ -1,4 +1,4 @@
-package main.currencyexchange.input.utils;
+package main.exchange.input.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,11 +7,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class ConnectionManager {
+public class ConnectionProvider {
     private static final Properties properties = new Properties();
 
     static {
-        try (InputStream input = ConnectionManager.class
+        try (InputStream input = ConnectionProvider.class
                 .getClassLoader()
                 .getResourceAsStream("application.properties")) {
 

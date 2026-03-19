@@ -1,11 +1,11 @@
-package main.currencyexchange.data.repositories;
+package main.exchange.data.repositories;
 
-import main.currencyexchange.input.exceptions.CurrencyNotFoundException;
-import main.currencyexchange.input.exceptions.DatabaseException;
-import main.currencyexchange.data.models.Currency;
-import main.currencyexchange.data.models.ExchangeRate;
+import main.exchange.input.exceptions.CurrencyNotFoundException;
+import main.exchange.input.exceptions.DatabaseException;
+import main.exchange.data.models.Currency;
+import main.exchange.data.models.ExchangeRate;
 
-import static main.currencyexchange.input.utils.ConnectionManager.open;
+import static main.exchange.input.utils.ConnectionProvider.open;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,11 +27,11 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
         ExchangeRate exchangeRate = new ExchangeRate();
 
         Currency baseCurrency = currencyRepository
-                .findById(rs.getLong("baseCurrencyId"))
+                .findById(rs.getLong("base_currency_id"))
                 .orElseThrow(() -> new CurrencyNotFoundException("Base currency not found"));
 
         Currency targetCurrency = currencyRepository
-                .findById(rs.getLong("targetCurrencyId"))
+                .findById(rs.getLong("target_currency_id"))
                 .orElseThrow(() -> new CurrencyNotFoundException("Target currency not found"));
 
         exchangeRate.setId(rs.getLong("id"));
@@ -47,10 +47,10 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
     public Optional<ExchangeRate> findByCurrencies(String baseCode, String targetCode) {
 
         String query = """
-        SELECT er.id, er.baseCurrencyId, er.targetCurrencyId, er.rate
+        SELECT er.id, er.base_currency_id, er.target_currency_id, er.rate
         FROM exchange_rates er
-        JOIN currencies bc ON er.baseCurrencyId = bc.id
-        JOIN currencies tc ON er.targetCurrencyId = tc.id
+        JOIN currencies bc ON er.base_currency_id = bc.id
+        JOIN currencies tc ON er.target_currency_id = tc.id
         WHERE bc.code = ? AND tc.code = ?
         """;
 
@@ -65,8 +65,7 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
             return !rs.next() ? Optional.empty() : Optional.of(createExchangeRate(rs));
 
         } catch (SQLException e) {
-            throw new DatabaseException("Failed to find exchange rate with base/taget codes="
-                    + baseCode + "/" + targetCode, e);
+            throw new DatabaseException("Failed to find exchange rate with base/taget codes=", e);
         }
     }
 
@@ -74,7 +73,7 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
     @Override
     public Optional<ExchangeRate> findById(long id) {
 
-        String query = "SELECT id, basecurrencyid, targetcurrencyid, rate FROM exchange_rates WHERE id = ?";
+        String query = "SELECT id, base_currency_id, target_currency_id, rate FROM exchange_rates WHERE id = ?";
 
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
@@ -93,7 +92,7 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
     @Override
     public void save(ExchangeRate exchangeRate){
 
-        String query = "INSERT INTO exchange_rates (basecurrencyid, targetcurrencyid, rate) VALUES (?, ?, ?)";
+        String query = "INSERT INTO exchange_rates (base_currency_id, target_currency_id, rate) VALUES (?, ?, ?)";
 
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query)) {
@@ -110,8 +109,7 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
             statement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new DatabaseException("Failed to find exchange rate with base/taget currencies="
-                    + exchangeRate.getBaseCurrency() + "/" + exchangeRate.getTargetCurrency(), e);
+            throw new DatabaseException("Failed to save exchange rate with chosen currencies", e);
         }
     }
 
@@ -131,8 +129,7 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
             return affectedRows > 0;
 
         } catch (SQLException e) {
-            throw new DatabaseException("Failed to find exchange rate with base/taget currencies="
-                    + exchangeRate.getBaseCurrency() + "/" + exchangeRate.getTargetCurrency(), e);
+            throw new DatabaseException("Failed to update exchange rate with chosen currencies", e);
         }
     }
 
@@ -157,7 +154,7 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
     public List<ExchangeRate> findAll(){
 
         List<ExchangeRate> exchangeRates = new ArrayList<>();
-        String query = "SELECT id, basecurrencyid, targetcurrencyid, rate FROM exchange_rates";
+        String query = "SELECT id, base_currency_id, target_currency_id, rate FROM exchange_rates";
 
         try (Connection conn = open();
              PreparedStatement statement = conn.prepareStatement(query);

@@ -1,4 +1,4 @@
-package main.currencyexchange.output.servlet;
+package main.exchange.output.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -6,9 +6,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import main.currencyexchange.input.exceptions.InvalidDataFormatException;
-import main.currencyexchange.data.models.Currency;
-import main.currencyexchange.input.service.CurrencyService;
+import main.exchange.input.exceptions.InvalidDataFormatException;
+import main.exchange.data.models.Currency;
+import main.exchange.input.service.CurrencyService;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,6 +32,7 @@ public class CurrencyController extends HttpServlet {
         if(code.isEmpty() || name.isEmpty() || sign.isEmpty()){
             throw new InvalidDataFormatException("Please, check entered fields");
         }
+
         if(code.length() != 3){
             throw new InvalidDataFormatException("Code length must be 3");
         }
@@ -65,23 +66,25 @@ public class CurrencyController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException{
         Optional<Currency> currency = getParamsAndCreateEntity(req);
         if(currency.isEmpty()) return;
         currencyService.create(currency.get());
 
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_CREATED);
+        objectMapper.writeValue(resp.getWriter(), currency.get());
     }
 
-    // PATCH /currencies
-    protected void doPatch(HttpServletRequest req, HttpServletResponse resp){
+
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws  IOException{
         Optional<Currency> currency= getParamsAndCreateEntity(req);
         if(currency.isEmpty()) return;
         currencyService.update(currency.get());
 
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_RESET_CONTENT);
+        objectMapper.writeValue(resp.getWriter(), currency.get());
         }
 
     @Override

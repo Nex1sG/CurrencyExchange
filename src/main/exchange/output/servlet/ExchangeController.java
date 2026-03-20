@@ -1,4 +1,4 @@
-package main.currencyexchange.output.servlet;
+package main.exchange.output.servlet;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,11 +6,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import main.currencyexchange.data.models.ExchangeResponse;
-import main.currencyexchange.data.repositories.CurrencyRepository;
-import main.currencyexchange.data.repositories.ExchangeRateRepository;
-import main.currencyexchange.input.exceptions.InvalidDataFormatException;
-import main.currencyexchange.input.service.ExchangeService;
+import main.exchange.data.models.ExchangeResponseDTO;
+import main.exchange.data.repositories.CurrencyRepository;
+import main.exchange.data.repositories.ExchangeRateRepository;
+import main.exchange.input.exceptions.InvalidDataFormatException;
+import main.exchange.input.service.ExchangeService;
+import main.exchange.input.utils.ObjectMapperProvider;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -20,7 +21,7 @@ public class ExchangeController extends HttpServlet {
     private final CurrencyRepository currencyRepository = new CurrencyRepository();
     private final ExchangeRateRepository exchangeRateRepository = new ExchangeRateRepository(currencyRepository);
     private final ExchangeService exchangeRateService = new ExchangeService(currencyRepository, exchangeRateRepository);
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = ObjectMapperProvider.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
@@ -32,10 +33,10 @@ public class ExchangeController extends HttpServlet {
         try {
             amount = new BigDecimal(req.getParameter("amount"));
         } catch (NumberFormatException e) {
-            throw new InvalidDataFormatException("Some problems with amount");
+            throw new InvalidDataFormatException("Some problems with amount: ");
         }
 
-        ExchangeResponse exchangeResponse = exchangeRateService.exchange(base, target, amount);
+        ExchangeResponseDTO exchangeResponse = exchangeRateService.exchange(base, target, amount);
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_OK);
         objectMapper.writeValue(resp.getWriter(), exchangeResponse);

@@ -1,4 +1,4 @@
-package main.currencyexchange.data.models;
+package main.exchange.data.models;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Currency {
+public class CurrencyEntity {
     private Long id;
     private String code;
     private String name;

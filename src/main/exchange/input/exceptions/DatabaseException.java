@@ -1,4 +1,4 @@
-package main.currencyexchange.input.exceptions;
+package main.exchange.input.exceptions;
 
 public class DatabaseException extends RuntimeException {
     public DatabaseException(String message, Throwable cause) {

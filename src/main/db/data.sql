@@ -1,14 +1,14 @@
-INSERT INTO currencies (ID, Code, Fullname, Sign) VALUES
-                                                       (1, 'USD', 'United States Dollar', '$'),
-                                                       (2, 'EUR', 'Euro', '€'),
-                                                       (3, 'GBP', 'British Pound Sterling', '£'),
-                                                       (4, 'JPY', 'Japanese Yen', '¥'),
-                                                       (5, 'CNY', 'Chinese Yuan', '¥'),
-                                                       (6, 'RUB', 'Russian Ruble', '₽'),
-                                                       (7, 'CHF', 'Swiss Franc', '₣'),
-                                                       (8, 'CAD', 'Canadian Dollar', '$'),
-                                                       (9, 'AUD', 'Australian Dollar', '$');
-INSERT INTO exchange_rates (ID, Basecurrencyid, Targetcurrencyid, Rate) VALUES
+INSERT INTO currencies (code, full_name, sign) VALUES
+                                                       ('USD', 'United States Dollar', '$'),
+                                                       ('EUR', 'Euro', '€'),
+                                                       ('GBP', 'British Pound Sterling', '£'),
+                                                       ('JPY', 'Japanese Yen', '¥'),
+                                                       ('CNY', 'Chinese Yuan', '¥'),
+                                                       ('RUB', 'Russian Ruble', '₽'),
+                                                       ('CHF', 'Swiss Franc', '₣'),
+                                                       ('CAD', 'Canadian Dollar', '$'),
+                                                       ('AUD', 'Australian Dollar', '$');
+INSERT INTO exchange_rates (id, base_currency_id, target_currency_id, rate) VALUES
                                                                                 (1, 1, 2, 0.92),   -- USD → EUR
                                                                                 (2, 2, 1, 1.09),   -- EUR → USD
                                                                                 (3, 1, 3, 0.78),   -- USD → GBP

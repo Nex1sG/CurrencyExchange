@@ -1,4 +1,4 @@
-package main.currencyexchange.data.models;
+package main.exchange.data.models;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,11 +11,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ExchangeRate {
+public class ExchangeRateEntity {
 
     private long id;
-    private Currency baseCurrency;
-    private Currency targetCurrency;
+    private CurrencyEntity baseCurrency;
+    private CurrencyEntity targetCurrency;
     private BigDecimal rate;
 
 }

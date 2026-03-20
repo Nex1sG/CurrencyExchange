@@ -1,4 +1,4 @@
-package main.currencyexchange.input.exceptions;
+package main.exchange.input.exceptions;
 
 public class ExchangeRateAlreadyExistsException extends RuntimeException{
     public ExchangeRateAlreadyExistsException(String message){

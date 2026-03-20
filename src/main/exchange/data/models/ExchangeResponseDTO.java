@@ -1,4 +1,4 @@
-package main.currencyexchange.data.models;
+package main.exchange.data.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,10 +11,10 @@ import java.math.BigDecimal;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExchangeResponse {
-    private Currency baseCurrency;
-    private Currency targetCurrency;
+public class ExchangeResponseDTO {
+    private CurrencyEntity baseCurrency;
+    private CurrencyEntity targetCurrency;
     private BigDecimal rate;
     private BigDecimal amount;
-    private BigDecimal convertedAmount;
+    private BigDecimal convertedAmount  ;
 }

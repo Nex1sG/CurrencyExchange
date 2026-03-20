@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Currency {
+public class CurrencyEntity {
     private Long id;
     private String code;
     private String name;

@@ -7,8 +7,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import main.exchange.input.exceptions.InvalidDataFormatException;
-import main.exchange.data.models.Currency;
+import main.exchange.data.models.CurrencyEntity;
 import main.exchange.input.service.CurrencyService;
+import main.exchange.input.utils.ObjectMapperProvider;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,9 +19,9 @@ import java.util.Optional;
 public class CurrencyController extends HttpServlet {
 
     private final CurrencyService currencyService = new CurrencyService();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = ObjectMapperProvider.getInstance();
 
-    public Optional<Currency> getParamsAndCreateEntity(HttpServletRequest req){
+    public Optional<CurrencyEntity> getParamsAndCreateEntity(HttpServletRequest req){
         String code = req.getParameter("code");
         String name = req.getParameter("name");
         String sign = req.getParameter("sign");
@@ -37,7 +38,7 @@ public class CurrencyController extends HttpServlet {
             throw new InvalidDataFormatException("Code length must be 3");
         }
 
-        Currency currency = new Currency();
+        CurrencyEntity currency = new CurrencyEntity();
         currency.setCode(code);
         currency.setName(name);
         currency.setSign(sign);
@@ -53,23 +54,23 @@ public class CurrencyController extends HttpServlet {
         resp.setContentType("application/json");
 
         if (pathInfo == null || pathInfo.equals("/")) {
-            List<Currency> currencies = currencyService.readReq();
+            List<CurrencyEntity> currencies = currencyService.readAllCurrencies();
             objectMapper.writeValue(resp.getWriter(), currencies);
             resp.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 
         String code = pathInfo.substring(1);
-        Currency currency = currencyService.readReq(code);
+        CurrencyEntity currency = currencyService.readCurrencyByCode(code);
         objectMapper.writeValue(resp.getWriter(), currency);
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException{
-        Optional<Currency> currency = getParamsAndCreateEntity(req);
+        Optional<CurrencyEntity> currency = getParamsAndCreateEntity(req);
         if(currency.isEmpty()) return;
-        currencyService.create(currency.get());
+        currencyService.createCurrency(currency.get());
 
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_CREATED);
@@ -78,9 +79,9 @@ public class CurrencyController extends HttpServlet {
 
 
     protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws  IOException{
-        Optional<Currency> currency= getParamsAndCreateEntity(req);
+        Optional<CurrencyEntity> currency= getParamsAndCreateEntity(req);
         if(currency.isEmpty()) return;
-        currencyService.update(currency.get());
+        currencyService.updateCurrency(currency.get());
 
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_RESET_CONTENT);
@@ -96,7 +97,7 @@ public class CurrencyController extends HttpServlet {
         }
 
         long id = Long.parseLong(pathInfo.substring(1));
-        currencyService.delete(id);
+        currencyService.deleteCurrency(id);
 
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);

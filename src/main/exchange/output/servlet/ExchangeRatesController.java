@@ -8,9 +8,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import main.exchange.input.exceptions.InvalidDataFormatException;
-import main.exchange.data.models.ExchangeRate;
+import main.exchange.data.models.ExchangeRateEntity;
 import main.exchange.input.service.CurrencyService;
 import main.exchange.input.service.ExchangeRateService;
+import main.exchange.input.utils.ObjectMapperProvider;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -21,7 +22,7 @@ public class ExchangeRatesController extends HttpServlet {
 
     private final CurrencyService currencyService = new CurrencyService();
     private final ExchangeRateService exchangeRateService = new ExchangeRateService();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = ObjectMapperProvider.getInstance();
 
     public record CurrencyPair(String base, String target) {}
 
@@ -36,11 +37,11 @@ public class ExchangeRatesController extends HttpServlet {
 
         CurrencyPair pair = extractPair(req);
 
-        ExchangeRate exchangeRate = exchangeRateService.readExchangeRate(
+        ExchangeRateEntity exchangeRateEntity = exchangeRateService.readExchangeRate(
                 pair.base(), pair.target()
         );
 
-        writeJson(resp, exchangeRate);
+        writeJson(resp, exchangeRateEntity);
     }
 
     @Override
@@ -55,12 +56,12 @@ public class ExchangeRatesController extends HttpServlet {
 
         BigDecimal rate = extractRate(req);
 
-        ExchangeRate exchangeRate = new ExchangeRate(
-                0, currencyService.readReq(base), currencyService.readReq(target), rate
+        ExchangeRateEntity exchangeRateEntity = new ExchangeRateEntity(
+                0, currencyService.readCurrencyByCode(base), currencyService.readCurrencyByCode(target), rate
         );
 
-        exchangeRateService.create(exchangeRate);
-        writeJson(resp, exchangeRate);
+        exchangeRateService.create(exchangeRateEntity);
+        writeJson(resp, exchangeRateEntity);
     }
 
     @Override
@@ -69,14 +70,14 @@ public class ExchangeRatesController extends HttpServlet {
         CurrencyPair pair = extractPair(req);
         BigDecimal rate = extractRate(req);
 
-        ExchangeRate exchangeRate = new ExchangeRate();
-        exchangeRate.setBaseCurrency(currencyService.readReq(pair.base()));
-        exchangeRate.setTargetCurrency(currencyService.readReq(pair.target()));
-        exchangeRate.setRate(rate);
+        ExchangeRateEntity exchangeRateEntity = new ExchangeRateEntity();
+        exchangeRateEntity.setBaseCurrency(currencyService.readCurrencyByCode(pair.base()));
+        exchangeRateEntity.setTargetCurrency(currencyService.readCurrencyByCode(pair.target()));
+        exchangeRateEntity.setRate(rate);
 
-        exchangeRateService.update(exchangeRate);
+        exchangeRateService.update(exchangeRateEntity);
 
-        ExchangeRate updated = exchangeRateService.readExchangeRate(
+        ExchangeRateEntity updated = exchangeRateService.readExchangeRate(
                 pair.base(), pair.target()
         );
 

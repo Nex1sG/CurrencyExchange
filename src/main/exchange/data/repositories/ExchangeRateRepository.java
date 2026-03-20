@@ -2,10 +2,10 @@ package main.exchange.data.repositories;
 
 import main.exchange.input.exceptions.CurrencyNotFoundException;
 import main.exchange.input.exceptions.DatabaseException;
-import main.exchange.data.models.Currency;
-import main.exchange.data.models.ExchangeRate;
+import main.exchange.data.models.CurrencyEntity;
+import main.exchange.data.models.ExchangeRateEntity;
 
-import static main.exchange.input.utils.ConnectionProvider.open;
+import static main.exchange.input.utils.PostgresConnection.open;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,36 +15,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
+public class ExchangeRateRepository implements CrudRepository<ExchangeRateEntity> {
 
     private final CurrencyRepository currencyRepository;
     public ExchangeRateRepository(CurrencyRepository currencyRepository) {
         this.currencyRepository = currencyRepository;
     }
 
-    public ExchangeRate createExchangeRate(ResultSet rs) throws SQLException {
+    public ExchangeRateEntity createExchangeRate(ResultSet rs) throws SQLException {
 
-        ExchangeRate exchangeRate = new ExchangeRate();
+        ExchangeRateEntity exchangeRateEntity = new ExchangeRateEntity();
 
-        Currency baseCurrency = currencyRepository
+        CurrencyEntity baseCurrency = currencyRepository
                 .findById(rs.getLong("base_currency_id"))
                 .orElseThrow(() -> new CurrencyNotFoundException("Base currency not found"));
 
-        Currency targetCurrency = currencyRepository
+        CurrencyEntity targetCurrency = currencyRepository
                 .findById(rs.getLong("target_currency_id"))
                 .orElseThrow(() -> new CurrencyNotFoundException("Target currency not found"));
 
-        exchangeRate.setId(rs.getLong("id"));
-        exchangeRate.setBaseCurrency(baseCurrency);
-        exchangeRate.setTargetCurrency(targetCurrency);
-        exchangeRate.setRate(rs.getBigDecimal("rate"));
+        exchangeRateEntity.setId(rs.getLong("id"));
+        exchangeRateEntity.setBaseCurrency(baseCurrency);
+        exchangeRateEntity.setTargetCurrency(targetCurrency);
+        exchangeRateEntity.setRate(rs.getBigDecimal("rate"));
 
-        return exchangeRate;
+        return exchangeRateEntity;
     }
 
 
 
-    public Optional<ExchangeRate> findByCurrencies(String baseCode, String targetCode) {
+    public Optional<ExchangeRateEntity> findByCurrencies(String baseCode, String targetCode) {
 
         String query = """
         SELECT er.id, er.base_currency_id, er.target_currency_id, er.rate
@@ -65,13 +65,18 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
             return !rs.next() ? Optional.empty() : Optional.of(createExchangeRate(rs));
 
         } catch (SQLException e) {
-            throw new DatabaseException("Failed to find exchange rate with base/taget codes=", e);
+            throw new DatabaseException(
+                    new StringBuilder("Failed to find exchange rate with base/taget codes=")
+                            .append(baseCode)
+                            .append("/")
+                            .append(targetCode)
+                            .toString(), e);
         }
     }
 
 
     @Override
-    public Optional<ExchangeRate> findById(long id) {
+    public Optional<ExchangeRateEntity> findById(long id) {
 
         String query = "SELECT id, base_currency_id, target_currency_id, rate FROM exchange_rates WHERE id = ?";
 
@@ -84,13 +89,16 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
             return !rs.next() ? Optional.empty() : Optional.of(createExchangeRate(rs));
 
         } catch (SQLException e) {
-            throw new DatabaseException("Failed to find exchange rate with id=" + id, e);
+            throw new DatabaseException(
+                    new StringBuilder("Failed to find exchange rate with id=")
+                            .append(id)
+                            .toString(), e);
         }
     }
 
 
     @Override
-    public void save(ExchangeRate exchangeRate){
+    public void save(ExchangeRateEntity exchangeRate){
 
         String query = "INSERT INTO exchange_rates (base_currency_id, target_currency_id, rate) VALUES (?, ?, ?)";
 
@@ -115,7 +123,7 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
 
 
     @Override
-    public boolean update(ExchangeRate exchangeRate){
+    public boolean update(ExchangeRateEntity exchangeRate){
 
         String query = "UPDATE exchange_rates SET rate = ? WHERE id = ?";
 
@@ -146,14 +154,17 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
             return affectedRows > 0;
 
         } catch (SQLException e) {
-            throw new DatabaseException("Failed to find exchange rate with id=" + id, e);
+            throw new DatabaseException(
+            new StringBuilder("Failed to delete exchange rate with id=")
+                    .append(id)
+                    .toString(), e);
         }
     }
 
     @Override
-    public List<ExchangeRate> findAll(){
+    public List<ExchangeRateEntity> findAll(){
 
-        List<ExchangeRate> exchangeRates = new ArrayList<>();
+        List<ExchangeRateEntity> exchangeRateEntities = new ArrayList<>();
         String query = "SELECT id, base_currency_id, target_currency_id, rate FROM exchange_rates";
 
         try (Connection conn = open();
@@ -161,12 +172,12 @@ public class ExchangeRateRepository implements CrudRepository<ExchangeRate> {
              ResultSet rs = statement.executeQuery()) {
 
             while (rs.next()) {
-                ExchangeRate exchangeRate =createExchangeRate(rs);
-                if(exchangeRate != null) exchangeRates.add(exchangeRate);
+                ExchangeRateEntity exchangeRate =createExchangeRate(rs);
+                if(exchangeRate != null) exchangeRateEntities.add(exchangeRate);
 
             }
 
-            return exchangeRates;
+            return exchangeRateEntities;
 
         } catch (SQLException e) {
             throw new DatabaseException("Failed to find all exchange rates", e);

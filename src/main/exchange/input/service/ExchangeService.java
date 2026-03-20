@@ -5,9 +5,9 @@ import main.exchange.input.exceptions.CurrencyNotFoundException;
 import main.exchange.input.exceptions.ExchangeRateNotFoundException;
 import main.exchange.data.repositories.CurrencyRepository;
 import main.exchange.data.repositories.ExchangeRateRepository;
-import main.exchange.data.models.Currency;
-import main.exchange.data.models.ExchangeRate;
-import main.exchange.data.models.ExchangeResponse;
+import main.exchange.data.models.CurrencyEntity;
+import main.exchange.data.models.ExchangeRateEntity;
+import main.exchange.data.models.ExchangeResponseDTO;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,11 +21,11 @@ public class ExchangeService {
     private final static String USD_CODE = "USD";
     private static final int SCALE = 6;
 
-    public ExchangeResponse exchange(String baseCode, String targetCode, BigDecimal amount){
-        Currency baseCurrency = currencyRepository.findByCode(baseCode)
+    public ExchangeResponseDTO exchange(String baseCode, String targetCode, BigDecimal amount){
+        CurrencyEntity baseCurrency = currencyRepository.findByCode(baseCode)
                 .orElseThrow(() -> new CurrencyNotFoundException("Currency not found: " + baseCode));
 
-        Currency targetCurrency = currencyRepository.findByCode(targetCode)
+        CurrencyEntity targetCurrency = currencyRepository.findByCode(targetCode)
                 .orElseThrow(() -> new CurrencyNotFoundException("Currency not found: " + targetCode));
 
         BigDecimal rate = findExchangeRate(baseCode, targetCode);
@@ -36,7 +36,7 @@ public class ExchangeService {
         }
 
 
-        ExchangeResponse response = new ExchangeResponse();
+        ExchangeResponseDTO response = new ExchangeResponseDTO();
         response.setBaseCurrency(baseCurrency);
         response.setTargetCurrency(targetCurrency);
         response.setRate(rate);
@@ -49,11 +49,11 @@ public class ExchangeService {
     public BigDecimal findExchangeRate(String baseCode, String targetCode){
         if(baseCode.equals(targetCode)) return BigDecimal.valueOf(1);
 
-        Optional<ExchangeRate> directRate = exchangeRateRepository.findByCurrencies(baseCode, targetCode);
+        Optional<ExchangeRateEntity> directRate = exchangeRateRepository.findByCurrencies(baseCode, targetCode);
         if (directRate.isPresent()) {
             return directRate.get().getRate();
         }
-        Optional<ExchangeRate> reverseRate = exchangeRateRepository.findByCurrencies(targetCode, baseCode);
+        Optional<ExchangeRateEntity> reverseRate = exchangeRateRepository.findByCurrencies(targetCode, baseCode);
         return reverseRate.map(exchangeRate -> BigDecimal.ONE.divide(exchangeRate.getRate(),
                 6, RoundingMode.DOWN)).orElseGet(() -> findRateThroughUSD(baseCode, targetCode));
 
@@ -77,18 +77,18 @@ public class ExchangeService {
 
     private BigDecimal getDirectUSDRate(String currencyCode) {
 
-        Optional<ExchangeRate> usdRate = exchangeRateRepository.findByCurrencies(USD_CODE, currencyCode);
+        Optional<ExchangeRateEntity> usdRate = exchangeRateRepository.findByCurrencies(USD_CODE, currencyCode);
 
         if (usdRate.isPresent()) {
             return usdRate.get().getRate();
         }
 
-        Optional<ExchangeRate> reverseUsdRate = exchangeRateRepository.findByCurrencies(currencyCode, USD_CODE);
+        Optional<ExchangeRateEntity> reverseUsdRate = exchangeRateRepository.findByCurrencies(currencyCode, USD_CODE);
         if (reverseUsdRate.isPresent()) {
             return BigDecimal.ONE.divide(reverseUsdRate.get().getRate(), SCALE, RoundingMode.HALF_UP);
         }
 
-        throw new ExchangeRateNotFoundException("Cannot find direct | reverse | cross courses");
+        throw new ExchangeRateNotFoundException("Cannot find direct / reverse / cross courses");
     }
 }
 
